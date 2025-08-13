@@ -10,11 +10,13 @@ export default defineConfig({
     host: true,
     port: 5173,  // 如果需要，你可以设置你自己的端口
     proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL,  // 设置目标服务器的地址
-        changeOrigin: true,  // 改变请求头中的 Origin，避免 CORS 问题
-        rewrite: (path) => path.replace(/^\/api/, ''),  // 去掉 /api 前缀
-      },
-    },
+  '/gis': {
+    target: 'http://123.58.56.61/api',
+    changeOrigin: true,
+    rewrite: path => path.replace(/^\/gis/, ''),
+  }
+}
+
   },
 })
+console.log('VITE_API_URL:', process.env.VITE_API_URL);

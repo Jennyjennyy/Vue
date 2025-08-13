@@ -1,16 +1,5 @@
 <template>
   <div class="chart-section">
-    <!-- 年份按钮 -->
-    <div class="year-selector">
-      <button
-        v-for="year in years"
-        :key="year"
-        @click="setYear(year)"
-        :class="{ active: year === selectedYear }"
-      >
-        {{ year }}
-      </button>
-    </div>
     <!-- 表格 -->
     <a-table
       class="table-section"
@@ -25,51 +14,41 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import * as echarts from 'echarts'
+
+// ✅ 接收从 App.vue 传来的点击网格数据
+const props = defineProps({
+  gridData: {
+    type: Object,
+    default: () => ({})
+  }
+})
+console.log('ListData 接收到 gridData:', props.gridData)
 
 const chartRef = ref(null)
 const chartInstance = ref(null)
-
-const years = [2021, 2022, 2023]
-const selectedYear = ref(2021)
 
 const radarData = {
   2021: {
     allocated: [4200, 3000, 20000, 35000, 50000, 18000],
     actual: [5000, 14000, 28000, 26000, 42000, 21000]
-  },
-  2022: {
-    allocated: [4500, 3200, 18000, 33000, 49000, 16000],
-    actual: [4800, 15000, 29000, 25000, 40000, 20000]
-  },
-  2023: {
-    allocated: [4600, 3100, 19000, 34000, 51000, 17000],
-    actual: [4900, 13000, 27000, 27000, 41000, 22000]
   }
 }
 
-const getOption = (year) => ({
+const getOption = () => ({
   title: {
-    text: `${year} 年雷达图`,
-    textStyle: {
-      fontSize: 10 
-    }
+    text: `雷达图`,
+    textStyle: { fontSize: 10 }
   },
   legend: {
     data: ['Allocated Budget', 'Actual Spending'],
     bottom: 0,
-    textStyle: {
-      fontSize: 10 
-    }
+    textStyle: { fontSize: 10 }
   },
   radar: {
-    radius: 60, 
-    name: {
-      textStyle: {
-        fontSize: 10 
-      }
-    },
+    radius: 60,
+    name: { textStyle: { fontSize: 10 } },
     indicator: [
       { name: 'Sales', max: 6500 },
       { name: 'Administration', max: 16000 },
@@ -83,17 +62,15 @@ const getOption = (year) => ({
     {
       name: 'Budget vs spending',
       type: 'radar',
-      symbolSize: 3, 
-      lineStyle: {
-        width: 1 
-      },
+      symbolSize: 3,
+      lineStyle: { width: 1 },
       data: [
         {
-          value: radarData[year].allocated,
+          value: radarData[2021].allocated,
           name: 'Allocated Budget'
         },
         {
-          value: radarData[year].actual,
+          value: radarData[2021].actual,
           name: 'Actual Spending'
         }
       ]
@@ -102,42 +79,80 @@ const getOption = (year) => ({
 })
 
 const columns = [
-  {
-    title: '区域',
-    dataIndex: 'region',
-    key: 'region'
-  },
-  {
-    title: '数量',
-    dataIndex: 'value',
-    key: 'value'
-  }
+  { title: '区域', dataIndex: 'region', key: 'region' },
+  { title: '数量', dataIndex: 'value', key: 'value' }
 ]
 
-const dataSource = ref(
-  Array.from({ length: 10 }, (_, i) => ({
-    key: i + 1,
-    region: `格子 ${String(i + 1).padStart(3, '0')}`,
-    value: Math.floor(Math.random() * 100)
-  }))
-)
-
-const setYear = (year) => {
-  selectedYear.value = year
-  dataSource.value = Array.from({ length: 10 }, (_, i) => ({
-    key: i + 1,
-    region: `格子 ${String(i + 1).padStart(3, '0')}`,
-    value: radarData[year].allocated[i]
-  }))
+const fieldList = [
+  'FID', 
+  '新建文e', '新建文e_1', '新建文e_2', '新建文e_3', '新建文e_4', '新建文e_5', '新建文e_6', '新建文e_7', '新建文e_8', '新建文e_9',
+  '新建文e10', '新建文e11', '新建文e12', '新建文e13',
+  '_博士_su', '_研究生', '_本科_su', '_大专_su', '_中专_su', '_高中_su', '_初中_su', '_初中以', '_义务教', '_学龄前',
+  '_工业_su', '_农业_su', '_服务业', '_交通运', '_农业养', '_建筑业', '_其他_su', '_无业_su', '_非劳动'
+]
+const fieldAliasMap = {
+  'FID': 'FID',
+  '新建文e': '总人口',
+  '新建文e_1': '男性人口',
+  '新建文e_2': '女性人口',
+  '新建文e_3': '三岁以下',
+  '新建文e_4': '四至六岁',
+  '新建文e_5': '七至十二岁',
+  '新建文e_6': '十三至十五岁',
+  '新建文e_7': '十六至十八岁',
+  '新建文e_8': '十九至二十三岁',
+  '新建文e_9': '二十四至三十岁',
+  '新建文e10': '三十一至四十岁',
+  '新建文e11': '四十一至六十岁',
+  '新建文e12': '六十一至八十岁',
+  '新建文e13': '八十岁以上',
+  '_博士_su': '博士',
+  '_研究生': '研究生',
+  '_本科_su': '本科',
+  '_大专_su': '大专',
+  '_中专_su': '中专',
+  '_高中_su': '高中',
+  '_初中_su': '初中',
+  '_初中以': '初中以下',
+  '_义务教': '义务教育',
+  '_学龄前': '学龄前',
+  '_工业_su': '工业',
+  '_农业_su': '农业',
+  '_服务业': '服务业',
+  '_交通运': '交通运输',
+  '_农业养': '农业养殖',
+  '_建筑业': '建筑业',
+  '_其他_su': '其他',
+  '_无业_su': '无业',
+  '_非劳动': '非劳动人群'
 }
+
+const dataSource = computed(() => {
+  if (!props.gridData || Object.keys(props.gridData).length === 0) {
+    return [
+      {
+        key: 1,
+        region: '暂无数据',
+        value: '-'
+      }
+    ]
+  }
+
+  return fieldList.map((field, index) => ({
+    key: index,
+    region: fieldAliasMap[field] || field,
+    value: props.gridData[field] ?? '-'
+  }))
+})
+
+
+
+
+
 
 onMounted(() => {
   chartInstance.value = echarts.init(chartRef.value)
-  chartInstance.value.setOption(getOption(selectedYear.value))
-})
-
-watch(selectedYear, (newYear) => {
-  chartInstance.value.setOption(getOption(newYear))
+  chartInstance.value.setOption(getOption())
 })
 </script>
 
@@ -160,25 +175,6 @@ watch(selectedYear, (newYear) => {
   justify-content: space-between;
 }
 
-.year-selector {
-  margin-bottom: 10px;
-}
-
-.year-selector button {
-  margin: 0 5px;
-  padding: 6px 12px;
-  font-size: 12px;
-  border: 1px solid #aaa;
-  background-color: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.year-selector button.active {
-  background-color: #2c3e50;
-  color: white;
-}
-
 .chart {
   width: 320px;
   height: 300px;
@@ -192,3 +188,4 @@ watch(selectedYear, (newYear) => {
   font-size: 12px;
 }
 </style>
+

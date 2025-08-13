@@ -33,7 +33,7 @@ onMounted(async () => {
 <style scoped>
 .map-view {
   width: 100%;
-  height: 400px;  /* 设定地图高度 */
+  height: 1000px;  /* 设定地图高度 */
 }
 </style>
 
