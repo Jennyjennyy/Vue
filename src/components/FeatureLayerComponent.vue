@@ -46,12 +46,12 @@ const onCheck = async (checkedKeysValue) => {
   }
 
   const [FeatureLayer] = await loadModules(['esri/layers/FeatureLayer'])
-  const layerUrl = import.meta.env.VITE_ARCGIS_URL;
+  
 
   // 如果 FeatureLayer 还没有创建，就创建它
   if (!featureLayer) {
     featureLayer = new FeatureLayer({
-      url: layerUrl,
+      url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
       id: 'grid-layer',
       outFields: ['*']
     });
