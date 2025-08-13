@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h1 class="page-title">城市不均衡时空数据融合与空间画像分析平台</h1>
+    <h1 class="page-title">城市不均衡时空数据可视分析与综合模拟平台</h1>
 
     <!-- ✅ 传入点击后的网格数据 -->
     <ListData :gridData="selectedGridData" />
