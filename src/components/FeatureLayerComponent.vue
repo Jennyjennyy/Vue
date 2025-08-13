@@ -46,11 +46,12 @@ const onCheck = async (checkedKeysValue) => {
   }
 
   const [FeatureLayer] = await loadModules(['esri/layers/FeatureLayer'])
+  const layerUrl = import.meta.env.VITE_ARCGIS_URL;
 
   // 如果 FeatureLayer 还没有创建，就创建它
   if (!featureLayer) {
     featureLayer = new FeatureLayer({
-      url: '/gis/map-79/arcgis/rest/services/keti/MapServer/0',
+      url: layerUrl,
       id: 'grid-layer',
       outFields: ['*']
     });
@@ -68,7 +69,7 @@ const onCheck = async (checkedKeysValue) => {
 
     features.forEach(f => {
       const attrs = f.attributes
-      console.log(`🧾 FID: ${attrs.FID}, name: ${attrs.name}, _服务业: ${attrs._服务业}`)
+      console.log(`FID: ${attrs.FID}, name: ${attrs.name}, _服务业: ${attrs._服务业}`)
     })
   }).catch(err => {
     console.error('查询 _服务业 字段失败:', err)
