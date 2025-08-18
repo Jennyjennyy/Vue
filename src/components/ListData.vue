@@ -84,12 +84,15 @@ const columns = [
 ]
 
 const fieldList = [
-  'FID', 
+  'FID', 'id', 'left', 'top', 'right', 'bottom', 'row_index', 'col_index', 'adcode', 'name', 'center', 'centroid',
+  'childrenNu', 'level', 'acroutes', 'parent', 'inter_area', 'coverage_r',
   '新建文e', '新建文e_1', '新建文e_2', '新建文e_3', '新建文e_4', '新建文e_5', '新建文e_6', '新建文e_7', '新建文e_8', '新建文e_9',
   '新建文e10', '新建文e11', '新建文e12', '新建文e13',
   '_博士_su', '_研究生', '_本科_su', '_大专_su', '_中专_su', '_高中_su', '_初中_su', '_初中以', '_义务教', '_学龄前',
-  '_工业_su', '_农业_su', '_服务业', '_交通运', '_农业养', '_建筑业', '_其他_su', '_无业_su', '_非劳动'
-]
+  '_工业_su', '_农业_su', '_服务业', '_交通运', '_农业养', '_建筑业', '_其他_su', '_无业_su', '_非劳动',
+  'UrbanData_', 'UrbanDat_1', 'UrbanDat_2', 'UrbanDat_3', 'UrbanDat_4', 'UrbanDat_5', 'UrbanDat_6', 'UrbanDat_7', 'UrbanDat_8'
+];
+
 const fieldAliasMap = {
   'FID': 'FID',
   '新建文e': '总人口',
@@ -124,7 +127,16 @@ const fieldAliasMap = {
   '_建筑业': '建筑业',
   '_其他_su': '其他',
   '_无业_su': '无业',
-  '_非劳动': '非劳动人群'
+  '_非劳动': '非劳动人群',
+  'UrbanData_': '用电量数据（千瓦时）',
+  'UrbanDat_1': '建筑体积',
+  'UrbanDat_2': '2020年GDP（亿元）',
+  'UrbanDat_3': '平均房价',
+  'UrbanDat_4': '土地利用类型编码',
+  'UrbanDat_5': '土地利用类型名称',
+  'UrbanDat_6': '是否为城中村（1=是）',
+  'UrbanDat_7': '绿视率（NDVI）',
+  'UrbanDat_8': '空气质量（PM2.5）'
 }
 
 const dataSource = computed(() => {
