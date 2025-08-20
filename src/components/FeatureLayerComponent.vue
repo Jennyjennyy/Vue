@@ -8,6 +8,7 @@
       class="tree-panel"
     />
   </div>
+  
 </template>
 
 <script setup>
@@ -94,7 +95,11 @@ const treeData = [
         title: '人口',
         key: 'population',
         children: [
-          // 如果你之后有“人口密度”或“分学历人口”图层，可以加在这里
+          {
+      title: '人口密度专题图',
+      key: 'pop-layer'
+        }
+          // 其他人口相关图层可以后续添加 
         ]
       }
     ]
@@ -120,6 +125,9 @@ let landuseLayer = null
 let landuseLegendInstance = null
 let czcLayer = null
 let czcLegendInstance = null
+let popLayer = null;
+let popLegendInstance = null;
+
 
 // 在 onMounted 中设置一次性的事件监听
 onMounted(() => {
@@ -245,6 +253,9 @@ if (checkedKeysValue.includes('ndvi-layer')) {
       const ndviRenderer = {
         type: 'class-breaks',
         field: 'UrbanDat_7',
+        legendOptions: {
+          title: '绿化率（NDVI）'
+        },
         classBreakInfos: [
           {
             minValue: 0.1,
@@ -353,6 +364,9 @@ if (checkedKeysValue.includes('pm25-layer')) {
       const pm25Renderer = {
         type: 'class-breaks',
         field: 'UrbanDat_8',
+        legendOptions: {
+          title: 'PM2.5 浓度分布'
+        },
         classBreakInfos: [
           {
             minValue: 0,
@@ -460,6 +474,9 @@ if (checkedKeysValue.includes('fangjia-layer')) {
       const fangjiaRenderer = {
         type: 'class-breaks',
         field: 'UrbanDat_3',
+        legendOptions: {
+          title: '房价分布（元/平方米）'
+        },
         classBreakInfos: [
           {
             minValue: 0,
@@ -695,6 +712,9 @@ if (checkedKeysValue.includes('volume-layer')) {
       const volumeRenderer = {
         type: 'class-breaks',
         field: 'UrbanDat_1',
+        legendOptions: {
+          title: '建筑体积分布（m³）'
+        },
         classBreakInfos: [
           { minValue: 0, maxValue: 1000, label: '0–1000 m³', symbol: { type: 'simple-fill', color: '#ffffcc', outline: { width: 0.5, color: '#666' } } },
           { minValue: 1000, maxValue: 2000, label: '1000–2000 m³', symbol: { type: 'simple-fill', color: '#ffeb99', outline: { width: 0.5, color: '#666' } } },
@@ -765,6 +785,9 @@ if (checkedKeysValue.includes('power-layer')) {
       const powerRenderer = {
         type: 'class-breaks',
         field: 'UrbanData_',
+        legendOptions: {
+          title: '用电量（kWh）'
+        },
         classBreakInfos: [
           { minValue: 0, maxValue: 4000000, label: '0–4百万 kWh', symbol: { type: 'simple-fill', color: '#ffffcc', outline: { width: 0.5, color: '#666' } } },
           { minValue: 4000000, maxValue: 8000000, label: '4–8百万 kWh', symbol: { type: 'simple-fill', color: '#ffeb99', outline: { width: 0.5, color: '#666' } } },
@@ -832,6 +855,9 @@ if (checkedKeysValue.includes('landuse-layer')) {
       const landuseRenderer = {
         type: 'unique-value',
         field: 'UrbanDat_5',
+        legendOptions: {
+          title: '土地利用类型'
+        },
         uniqueValueInfos: [
           { value: '水体', label: '水体', symbol: { type: 'simple-fill', color: '#a6bddb', outline: { width: 0.5, color: '#666' } } },
           { value: '绿地', label: '绿地', symbol: { type: 'simple-fill', color: '#74c476', outline: { width: 0.5, color: '#666' } } },
@@ -901,6 +927,9 @@ if (checkedKeysValue.includes('czc-layer')) {
       const czcRenderer = {
         type: 'unique-value',
         field: 'UrbanDat_6',
+        legendOptions: {
+          title: '城中村分布'
+        },
         uniqueValueInfos: [
           {
             value: 1,
@@ -929,7 +958,7 @@ if (checkedKeysValue.includes('czc-layer')) {
         outFields: ['*'],
         renderer: czcRenderer,
         opacity: 0.75,
-        visible: true // ✅ 初始可见
+        visible: true,
       });
     }
 
@@ -937,7 +966,7 @@ if (checkedKeysValue.includes('czc-layer')) {
     console.log('城中村专题图层已添加');
   }
 
-  // ✅ 图例处理逻辑不变
+  // 图例处理逻辑不变
   if (!czcLegendInstance) {
     czcLegendInstance = new Legend({
       view: view,
@@ -946,22 +975,130 @@ if (checkedKeysValue.includes('czc-layer')) {
         title: '城中村分布'
       }]
     });
+
+    
     view.ui.add(czcLegendInstance, 'bottom-left');
     console.log('城中村图例已创建');
   }
 } else {
-  // ✅ 改为隐藏图层而不是移除
+  // 改为隐藏图层而不是移除
   if (czcLayerExists) {
     czcLayerExists.visible = false;
     console.log('城中村专题图层已隐藏');
   }
 
-  // ✅ 图例仍然移除（也可改为保留但置灰）
+  // 图例仍然移除（也可改为保留但置灰）
   if (czcLegendInstance) {
     view.ui.remove(czcLegendInstance);
     czcLegendInstance.destroy();
     czcLegendInstance = null;
     console.log('城中村图例已移除');
+  }
+}
+const popLayerExists = view.map.findLayerById('pop-layer');
+
+if (checkedKeysValue.includes('pop-layer')) {
+  if (popLayerExists) {
+    popLayerExists.visible = true;
+    console.log('人口密度专题图层已显示');
+  } else {
+    if (!popLayer) {
+      const popRenderer = {
+        type: 'class-breaks',
+        field: '新建文e',
+        legendOptions: {
+          title: '人口密度'
+        },
+        classBreakInfos: [
+          {
+            minValue: 0,
+            maxValue: 0,
+            label: '0',
+            symbol: {
+              type: 'simple-fill',
+              color: '#deebf7',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 0,
+            maxValue: 100,
+            label: '0–100',
+            symbol: {
+              type: 'simple-fill',
+              color: '#9ecae1',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 100,
+            maxValue: 300,
+            label: '100–300',
+            symbol: {
+              type: 'simple-fill',
+              color: '#3182bd',
+              outline: { width: 0.5, color: '#666' }
+            }
+          },
+          {
+            minValue: 300,
+            maxValue: 500,
+            label: '300–500',
+            symbol: {
+              type: 'simple-fill',
+              color: '#08519c',
+              outline: { width: 0.5, color: '#333' }
+            }
+          },
+          {
+            minValue: 500,
+            maxValue: 10000,
+            label: '500–10000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#08306b',
+              outline: { width: 0.5, color: '#333' }
+            }
+          }
+        ]
+      };
+
+      popLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'pop-layer',
+        outFields: ['*'],
+        renderer: popRenderer,
+        opacity: 0.75,
+        visible: true
+      });
+    }
+
+    view.map.add(popLayer);
+    console.log('人口密度专题图层已添加');
+  }
+
+  if (!popLegendInstance) {
+    popLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: popLayer,
+        title: '人口密度分布'
+      }]
+    });
+    view.ui.add(popLegendInstance, 'bottom-left');
+    console.log('人口密度图例已创建');
+  }
+} else {
+  if (popLayerExists) {
+    popLayerExists.visible = false;
+    console.log('人口密度专题图层已隐藏');
+  }
+
+  if (popLegendInstance) {
+    view.ui.remove(popLegendInstance);
+    popLegendInstance.destroy();
+    popLegendInstance = null;
+    console.log('人口密度图例已移除');
   }
 }
 
@@ -975,7 +1112,7 @@ if (checkedKeysValue.includes('czc-layer')) {
   top: 65px;
   left: 0;
   width: 240px;
-  height: calc(100vh - 420px);
+  height: calc(100vh - 380px);
   background-color: #fff;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
   z-index: 1001;
