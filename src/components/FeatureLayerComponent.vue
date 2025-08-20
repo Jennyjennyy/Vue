@@ -13,7 +13,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { loadModules } from 'esri-loader'
-import MapViewSingleton from '../mapviewSingleton' // 确保这个路径是正确的
+import MapViewSingleton from '../mapviewSingleton' 
 
 const emit = defineEmits(['grid-clicked'])
 
@@ -24,36 +24,88 @@ const treeData = [
     children: [
       {
         title: '网格图层',
-        key: 'grid-layer',
+        key: 'grid-layer'
       },
       {
-        title: 'NDVI专题图',
-        key: 'ndvi-layer'
+        title: '国土',
+        key: 'land',
+        children: [
+          {
+            title: '土地利用类型专题图',
+            key: 'landuse-layer'
+          },
+          {
+            title: '建筑体积专题图',
+            key: 'volume-layer'
+          },
+          {
+            title: '城中村专题图',
+            key: 'czc-layer'
+          }
+        ]
       },
       {
-        title: 'PM2.5专题图',
-        key: 'pm25-layer'
+        title: '生态',
+        key: 'ecology',
+        children: [
+          {
+            title: 'NDVI专题图',
+            key: 'ndvi-layer'
+          },
+          {
+            title: 'PM2.5专题图',
+            key: 'pm25-layer'
+          }
+        ]
       },
       {
-        title: '房价专题图',
-        key: 'fangjia-layer'
+        title: '交通',
+        key: 'transport',
+        children: [
+          // 如果你之后有“公共交通流量”或“可达性”图层，可以加在这里
+        ]
       },
       {
-  title: '2020 GDP 专题图',
-  key: 'gdp-layer'
-},
+        title: '能源',
+        key: 'energy',
+        children: [
+          {
+            title: '用电量专题图',
+            key: 'power-layer'
+          }
+          // 光伏潜力图层可以后续添加
+        ]
+      },
       {
-        title: '建筑体积专题图',
-        key: 'volume-layer'
+        title: '经济',
+        key: 'economy',
+        children: [
+          {
+            title: '房价专题图',
+            key: 'fangjia-layer'
+          },
+          {
+            title: '2020 GDP 专题图',
+            key: 'gdp-layer'
+          }
+        ]
+      },
+      {
+        title: '人口',
+        key: 'population',
+        children: [
+          // 如果你之后有“人口密度”或“分学历人口”图层，可以加在这里
+        ]
       }
     ]
   }
-]
+];
+
 
 const checkedKeys = ref([])
 let featureLayer = null
 let ndviLayer = null
-let legendInstance = null // 用于追踪唯一的图例实例
+let legendInstance = null 
 let pm25Layer = null;
 let pm25LegendInstance = null;
 let fangjiaLayer = null;
@@ -61,10 +113,13 @@ let fangjiaLegendInstance = null;
 let gdpLayer = null;
 let gdpLegendInstance = null;
 let volumeLayer = null
-let volumeLegendInstance = null // 为建筑体积单独创建一个图例实例
-
-
-
+let volumeLegendInstance = null 
+let powerLayer = null
+let powerLegendInstance = null
+let landuseLayer = null
+let landuseLegendInstance = null
+let czcLayer = null
+let czcLegendInstance = null
 
 // 在 onMounted 中设置一次性的事件监听
 onMounted(() => {
@@ -177,113 +232,127 @@ const onCheck = async (checkedKeysValue) => {
   }
 
   // --- 2. 处理 NDVI 图层和图例 ---
-  const ndviLayerExists = view.map.findLayerById('ndvi-layer')
-  if (checkedKeysValue.includes('ndvi-layer')) {
-    if (!ndviLayerExists) {
-      if (!ndviLayer) {
-        const ndviRenderer = {
-          type: 'class-breaks',
-          field: 'UrbanDat_7',
-          classBreakInfos: [
-            
-            {
-              minValue: 0.1,
-              maxValue: 0.2,
-              label: '0.1-0.2',
-              symbol: {
-                type: 'simple-fill',
-                color: '#d9d9d9', // 灰色
-                outline: { width: 0.5, color: '#999' }
-              }
-            },
-            {
-              minValue: 0.2,
-              maxValue: 0.4,
-              label: '0.2-0.4',
-              symbol: {
-                type: 'simple-fill',
-                color: '#c2e699', // 浅绿
-                outline: { width: 0.5, color: '#666' }
-              }
-            },
-            {
-              minValue: 0.4,
-              maxValue: 0.6,
-              label: '0.4-0.6',
-              symbol: {
-                type: 'simple-fill',
-                color: '#78c679', // 中绿
-                outline: { width: 0.5, color: '#333' }
-              }
-            },
-            {
-              minValue: 0.6,
-              maxValue: 0.8,
-              label: '0.6-0.8',
-              symbol: {
-                type: 'simple-fill',
-                color: '#31a354', // 深绿
-                outline: { width: 0.5, color: '#333' }
-              }
-            },
-            {
-              minValue: 0.8,
-              maxValue: 1,
-              label: '0.8-1',
-              symbol: {
-                type: 'simple-fill',
-                color: '#006837', // 墨绿
-                outline: { width: 0.5, color: '#333' }
-              }
-            }
-          ]
-        };
-        ndviLayer = new FeatureLayer({
-          url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
-          id: 'ndvi-layer',
-          outFields: ['*'],
-          renderer: ndviRenderer
-        })
-      }
-      view.map.add(ndviLayer)
-      console.log('NDVI专题图层已添加')
-    }
+  const ndviLayerExists = view.map.findLayerById('ndvi-layer');
 
-    // 如果图例不存在，则创建它
-    if (!legendInstance) {
-      legendInstance = new Legend({
-        view: view,
-        layerInfos: [{
-          layer: ndviLayer,
-          title: 'NDVI专题图'
-        }]
-      })
-      view.ui.add(legendInstance, 'bottom-left')
-      console.log('图例已创建')
-    }
+if (checkedKeysValue.includes('ndvi-layer')) {
+  // ✅ 图层已存在，直接设置为可见
+  if (ndviLayerExists) {
+    ndviLayerExists.visible = true;
+    console.log('NDVI专题图层已显示');
   } else {
-    // 如果取消勾选 NDVI 图层
-    if (ndviLayerExists) {
-      view.map.remove(ndviLayerExists)
-      console.log('NDVI专题图层已移除')
+    // ✅ 图层不存在，首次创建并添加
+    if (!ndviLayer) {
+      const ndviRenderer = {
+        type: 'class-breaks',
+        field: 'UrbanDat_7',
+        classBreakInfos: [
+          {
+            minValue: 0.1,
+            maxValue: 0.2,
+            label: '0.1-0.2',
+            symbol: {
+              type: 'simple-fill',
+              color: '#d9d9d9',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 0.2,
+            maxValue: 0.4,
+            label: '0.2-0.4',
+            symbol: {
+              type: 'simple-fill',
+              color: '#c2e699',
+              outline: { width: 0.5, color: '#666' }
+            }
+          },
+          {
+            minValue: 0.4,
+            maxValue: 0.6,
+            label: '0.4-0.6',
+            symbol: {
+              type: 'simple-fill',
+              color: '#78c679',
+              outline: { width: 0.5, color: '#333' }
+            }
+          },
+          {
+            minValue: 0.6,
+            maxValue: 0.8,
+            label: '0.6-0.8',
+            symbol: {
+              type: 'simple-fill',
+              color: '#31a354',
+              outline: { width: 0.5, color: '#333' }
+            }
+          },
+          {
+            minValue: 0.8,
+            maxValue: 1,
+            label: '0.8-1',
+            symbol: {
+              type: 'simple-fill',
+              color: '#006837',
+              outline: { width: 0.5, color: '#333' }
+            }
+          }
+        ]
+      };
+
+      ndviLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'ndvi-layer',
+        outFields: ['*'],
+        renderer: ndviRenderer,
+        visible: true // ✅ 初始可见
+      });
+
+      view.map.add(ndviLayer);
+      console.log('NDVI专题图层已添加');
     }
-    // 同时，如果图例存在，则移除并销毁它
-    if (legendInstance) {
-      view.ui.remove(legendInstance)
-      legendInstance.destroy()
-      legendInstance = null // 重置实例变量
-      console.log('图例已移除')
-    }
+    
   }
+
+  // ✅ 图例处理逻辑不变
+  if (!legendInstance) {
+    legendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: ndviLayer,
+        title: 'NDVI专题图'
+      }]
+    });
+    view.ui.add(legendInstance, 'bottom-left');
+    console.log('图例已创建');
+  }
+} else {
+  // ✅ 改为隐藏图层而不是移除
+  if (ndviLayerExists) {
+    ndviLayerExists.visible = false;
+    console.log('NDVI专题图层已隐藏');
+  }
+  if (legendInstance) {
+    view.ui.remove(legendInstance);
+    legendInstance.destroy();
+    legendInstance = null;
+    console.log('图例已移除');
+  }
+}
 
   // --- 3. 处理 PM2.5 图层和图例 ---
 const pm25LayerExists = view.map.findLayerById('pm25-layer');
+
 if (checkedKeysValue.includes('pm25-layer')) {
-  if (!pm25LayerExists) {
+  // ✅ 图层已存在，直接设置为可见
+  if (pm25LayerExists) {
+    pm25LayerExists.visible = true;
+    console.log('PM2.5专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
     if (!pm25Layer) {
       const pm25Renderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_8', 
+        field: 'UrbanDat_8',
         classBreakInfos: [
           {
             minValue: 0,
@@ -291,7 +360,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
             label: '0-16.5',
             symbol: {
               type: 'simple-fill',
-              color: '#A8E6CF', // 浅绿色
+              color: '#A8E6CF',
               outline: { width: 0.5, color: '#666' }
             }
           },
@@ -301,7 +370,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
             label: '16.5-18.5',
             symbol: {
               type: 'simple-fill',
-              color: '#81C784', // 浅黄色
+              color: '#81C784',
               outline: { width: 0.5, color: '#666' }
             }
           },
@@ -311,7 +380,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
             label: '18.5-20',
             symbol: {
               type: 'simple-fill',
-              color: '#4CAF50', // 黄色
+              color: '#4CAF50',
               outline: { width: 0.5, color: '#666' }
             }
           },
@@ -321,7 +390,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
             label: '20-21.5',
             symbol: {
               type: 'simple-fill',
-              color: '#FFEB3B', // 橙色
+              color: '#FFEB3B',
               outline: { width: 0.5, color: '#333' }
             }
           },
@@ -331,27 +400,27 @@ if (checkedKeysValue.includes('pm25-layer')) {
             label: '21.5-50',
             symbol: {
               type: 'simple-fill',
-              color: '#F44336', // 橙红色
+              color: '#F44336',
               outline: { width: 0.5, color: '#333' }
             }
-          },
-          
+          }
         ]
       };
 
       pm25Layer = new FeatureLayer({
         url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
         id: 'pm25-layer',
-        outFields: ['*'], // 确保 PM2.5 字段被包含
+        outFields: ['*'],
         renderer: pm25Renderer,
-        
+        visible: true // ✅ 初始可见
       });
     }
+
     view.map.add(pm25Layer);
     console.log('PM2.5专题图层已添加');
   }
 
-  // 如果 PM2.5 的图例不存在，则创建它
+  // ✅ 图例处理逻辑不变
   if (!pm25LegendInstance) {
     pm25LegendInstance = new Legend({
       view: view,
@@ -360,32 +429,37 @@ if (checkedKeysValue.includes('pm25-layer')) {
         title: 'PM2.5 浓度分布'
       }]
     });
-    view.ui.add(pm25LegendInstance, 'bottom-left'); 
+    view.ui.add(pm25LegendInstance, 'bottom-left');
     console.log('PM2.5图例已创建');
   }
 } else {
-  // 如果取消勾选 PM2.5 图层
+  // ✅ 改为隐藏图层而不是移除
   if (pm25LayerExists) {
-    view.map.remove(pm25LayerExists);
-    console.log('PM2.5专题图层已移除');
+    pm25LayerExists.visible = false;
+    console.log('PM2.5专题图层已隐藏');
   }
-  // 同时，如果图例存在，则移除并销毁它
   if (pm25LegendInstance) {
     view.ui.remove(pm25LegendInstance);
     pm25LegendInstance.destroy();
-    pm25LegendInstance = null; // 重置实例变量
+    pm25LegendInstance = null;
     console.log('PM2.5图例已移除');
   }
 }
 
 // --- 4. 处理房价图层和图例 ---
 const fangjiaLayerExists = view.map.findLayerById('fangjia-layer');
+
 if (checkedKeysValue.includes('fangjia-layer')) {
-  if (!fangjiaLayerExists) {
+  // ✅ 图层已存在，直接设置为可见
+  if (fangjiaLayerExists) {
+    fangjiaLayerExists.visible = true;
+    console.log('房价专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
     if (!fangjiaLayer) {
       const fangjiaRenderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_3', 
+        field: 'UrbanDat_3',
         classBreakInfos: [
           {
             minValue: 0,
@@ -445,13 +519,16 @@ if (checkedKeysValue.includes('fangjia-layer')) {
         id: 'fangjia-layer',
         outFields: ['*'],
         renderer: fangjiaRenderer,
-        opacity: 0.75
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
       });
     }
+
     view.map.add(fangjiaLayer);
     console.log('房价专题图层已添加');
   }
 
+  // ✅ 图例处理逻辑不变
   if (!fangjiaLegendInstance) {
     fangjiaLegendInstance = new Legend({
       view: view,
@@ -460,14 +537,17 @@ if (checkedKeysValue.includes('fangjia-layer')) {
         title: '房价分布'
       }]
     });
-    view.ui.add(fangjiaLegendInstance, 'bottom-left'); // 避免和其他图例冲突
+    view.ui.add(fangjiaLegendInstance, 'bottom-left');
     console.log('房价图例已创建');
   }
 } else {
+  // ✅ 改为隐藏图层而不是移除
   if (fangjiaLayerExists) {
-    view.map.remove(fangjiaLayerExists);
-    console.log('房价专题图层已移除');
+    fangjiaLayerExists.visible = false;
+    console.log('房价专题图层已隐藏');
   }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
   if (fangjiaLegendInstance) {
     view.ui.remove(fangjiaLegendInstance);
     fangjiaLegendInstance.destroy();
@@ -476,10 +556,17 @@ if (checkedKeysValue.includes('fangjia-layer')) {
   }
 }
 
+
 // --- 5. 处理 GDP 图层和图例 ---
 const gdpLayerExists = view.map.findLayerById('gdp-layer');
+
 if (checkedKeysValue.includes('gdp-layer')) {
-  if (!gdpLayerExists) {
+  // ✅ 图层已存在，直接设置为可见
+  if (gdpLayerExists) {
+    gdpLayerExists.visible = true;
+    console.log('GDP专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
     if (!gdpLayer) {
       const gdpRenderer = {
         type: 'class-breaks',
@@ -556,13 +643,16 @@ if (checkedKeysValue.includes('gdp-layer')) {
         id: 'gdp-layer',
         outFields: ['*'],
         renderer: gdpRenderer,
-        opacity: 0.75
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
       });
     }
+
     view.map.add(gdpLayer);
     console.log('GDP专题图层已添加');
   }
 
+  // ✅ 图例处理逻辑不变
   if (!gdpLegendInstance) {
     gdpLegendInstance = new Legend({
       view: view,
@@ -571,14 +661,17 @@ if (checkedKeysValue.includes('gdp-layer')) {
         title: '2020 GDP 分布'
       }]
     });
-    view.ui.add(gdpLegendInstance, 'bottom-left'); // 避免和其他图例冲突
+    view.ui.add(gdpLegendInstance, 'bottom-left');
     console.log('GDP图例已创建');
   }
 } else {
+  // ✅ 改为隐藏图层而不是移除
   if (gdpLayerExists) {
-    view.map.remove(gdpLayerExists);
-    console.log('GDP专题图层已移除');
+    gdpLayerExists.visible = false;
+    console.log('GDP专题图层已隐藏');
   }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
   if (gdpLegendInstance) {
     view.ui.remove(gdpLegendInstance);
     gdpLegendInstance.destroy();
@@ -587,105 +680,31 @@ if (checkedKeysValue.includes('gdp-layer')) {
   }
 }
 
+
 // --- 处理建筑体积图层和图例 ---
 const volumeLayerExists = view.map.findLayerById('volume-layer');
+
 if (checkedKeysValue.includes('volume-layer')) {
-  if (!volumeLayerExists) {
+  // ✅ 图层已存在，直接设置为可见
+  if (volumeLayerExists) {
+    volumeLayerExists.visible = true;
+    console.log('建筑体积专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
     if (!volumeLayer) {
       const volumeRenderer = {
         type: 'class-breaks',
         field: 'UrbanDat_1',
         classBreakInfos: [
-          {
-            minValue: 0,
-            maxValue: 1000,
-            label: '0–1000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#ffffcc',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 1000,
-            maxValue: 2000,
-            label: '1000–2000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#ffeb99',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 2000,
-            maxValue: 3000,
-            label: '2000–3000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#ffcc66',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 3000,
-            maxValue: 4000,
-            label: '3000–4000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#ffb366',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 4000,
-            maxValue: 5000,
-            label: '4000–5000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#ff9966',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 5000,
-            maxValue: 6000,
-            label: '5000–6000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#cc6699',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 6000,
-            maxValue: 7000,
-            label: '6000–7000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#9933cc',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 7000,
-            maxValue: 8000,
-            label: '7000–8000 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#660099',
-              outline: { width: 0.5, color: '#666' }
-            }
-          },
-          {
-            minValue: 8000,
-            maxValue: 8100,
-            label: '8000–8100 m³',
-            symbol: {
-              type: 'simple-fill',
-              color: '#330066',
-              outline: { width: 0.5, color: '#666' }
-            }
-          }
+          { minValue: 0, maxValue: 1000, label: '0–1000 m³', symbol: { type: 'simple-fill', color: '#ffffcc', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 1000, maxValue: 2000, label: '1000–2000 m³', symbol: { type: 'simple-fill', color: '#ffeb99', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 2000, maxValue: 3000, label: '2000–3000 m³', symbol: { type: 'simple-fill', color: '#ffcc66', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 3000, maxValue: 4000, label: '3000–4000 m³', symbol: { type: 'simple-fill', color: '#ffb366', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 4000, maxValue: 5000, label: '4000–5000 m³', symbol: { type: 'simple-fill', color: '#ff9966', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 5000, maxValue: 6000, label: '5000–6000 m³', symbol: { type: 'simple-fill', color: '#cc6699', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 6000, maxValue: 7000, label: '6000–7000 m³', symbol: { type: 'simple-fill', color: '#9933cc', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 7000, maxValue: 8000, label: '7000–8000 m³', symbol: { type: 'simple-fill', color: '#660099', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 8000, maxValue: 8100, label: '8000–8100 m³', symbol: { type: 'simple-fill', color: '#330066', outline: { width: 0.5, color: '#666' } } }
         ]
       };
 
@@ -694,13 +713,16 @@ if (checkedKeysValue.includes('volume-layer')) {
         id: 'volume-layer',
         outFields: ['*'],
         renderer: volumeRenderer,
-        
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
       });
     }
+
     view.map.add(volumeLayer);
     console.log('建筑体积专题图层已添加');
   }
 
+  // ✅ 图例处理逻辑不变
   if (!volumeLegendInstance) {
     volumeLegendInstance = new Legend({
       view: view,
@@ -709,14 +731,17 @@ if (checkedKeysValue.includes('volume-layer')) {
         title: '建筑体积分布（m³）'
       }]
     });
-    view.ui.add(volumeLegendInstance, 'bottom-left'); 
+    view.ui.add(volumeLegendInstance, 'bottom-left');
     console.log('建筑体积图例已创建');
   }
 } else {
+  // ✅ 改为隐藏图层而不是移除
   if (volumeLayerExists) {
-    view.map.remove(volumeLayerExists);
-    console.log('建筑体积专题图层已移除');
+    volumeLayerExists.visible = false;
+    console.log('建筑体积专题图层已隐藏');
   }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
   if (volumeLegendInstance) {
     view.ui.remove(volumeLegendInstance);
     volumeLegendInstance.destroy();
@@ -724,6 +749,222 @@ if (checkedKeysValue.includes('volume-layer')) {
     console.log('建筑体积图例已移除');
   }
 }
+
+
+// --- 处理用电量图层和图例 ---
+const powerLayerExists = view.map.findLayerById('power-layer');
+
+if (checkedKeysValue.includes('power-layer')) {
+  // ✅ 图层已存在，直接设置为可见
+  if (powerLayerExists) {
+    powerLayerExists.visible = true;
+    console.log('用电量专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
+    if (!powerLayer) {
+      const powerRenderer = {
+        type: 'class-breaks',
+        field: 'UrbanData_',
+        classBreakInfos: [
+          { minValue: 0, maxValue: 4000000, label: '0–4百万 kWh', symbol: { type: 'simple-fill', color: '#ffffcc', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 4000000, maxValue: 8000000, label: '4–8百万 kWh', symbol: { type: 'simple-fill', color: '#ffeb99', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 8000000, maxValue: 12000000, label: '8–12百万 kWh', symbol: { type: 'simple-fill', color: '#ffcc66', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 12000000, maxValue: 16000000, label: '12–16百万 kWh', symbol: { type: 'simple-fill', color: '#ff9966', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 16000000, maxValue: 20000000, label: '16–20百万 kWh', symbol: { type: 'simple-fill', color: '#9933cc', outline: { width: 0.5, color: '#666' } } },
+          { minValue: 20000000, maxValue: 24100000, label: '20–24百万 kWh', symbol: { type: 'simple-fill', color: '#330066', outline: { width: 0.5, color: '#666' } } }
+        ]
+      };
+
+      powerLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'power-layer',
+        outFields: ['*'],
+        renderer: powerRenderer,
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
+      });
+    }
+
+    view.map.add(powerLayer);
+    console.log('用电量专题图层已添加');
+  }
+
+  // ✅ 图例处理逻辑不变
+  if (!powerLegendInstance) {
+    powerLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: powerLayer,
+        title: '用电量分布（kWh）'
+      }]
+    });
+    view.ui.add(powerLegendInstance, 'bottom-left');
+    console.log('用电量图例已创建');
+  }
+} else {
+  // ✅ 改为隐藏图层而不是移除
+  if (powerLayerExists) {
+    powerLayerExists.visible = false;
+    console.log('用电量专题图层已隐藏');
+  }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
+  if (powerLegendInstance) {
+    view.ui.remove(powerLegendInstance);
+    powerLegendInstance.destroy();
+    powerLegendInstance = null;
+    console.log('用电量图例已移除');
+  }
+}
+
+
+// --- 处理土地利用类型图层和图例 ---
+const landuseLayerExists = view.map.findLayerById('landuse-layer');
+
+if (checkedKeysValue.includes('landuse-layer')) {
+  // ✅ 图层已存在，直接设置为可见
+  if (landuseLayerExists) {
+    landuseLayerExists.visible = true;
+    console.log('土地利用类型专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
+    if (!landuseLayer) {
+      const landuseRenderer = {
+        type: 'unique-value',
+        field: 'UrbanDat_5',
+        uniqueValueInfos: [
+          { value: '水体', label: '水体', symbol: { type: 'simple-fill', color: '#a6bddb', outline: { width: 0.5, color: '#666' } } },
+          { value: '绿地', label: '绿地', symbol: { type: 'simple-fill', color: '#74c476', outline: { width: 0.5, color: '#666' } } },
+          { value: '商业', label: '商业', symbol: { type: 'simple-fill', color: '#fd8d3c', outline: { width: 0.5, color: '#666' } } },
+          { value: '交通', label: '交通', symbol: { type: 'simple-fill', color: '#fdae6b', outline: { width: 0.5, color: '#666' } } },
+          { value: '住宅', label: '住宅', symbol: { type: 'simple-fill', color: '#9e9ac8', outline: { width: 0.5, color: '#666' } } },
+          { value: '工业', label: '工业', symbol: { type: 'simple-fill', color: '#d7301f', outline: { width: 0.5, color: '#666' } } },
+          { value: '未知', label: '未知', symbol: { type: 'simple-fill', color: '#969696', outline: { width: 0.5, color: '#666' } } },
+          { value: '科教', label: '科教', symbol: { type: 'simple-fill', color: '#6baed6', outline: { width: 0.5, color: '#666' } } }
+        ]
+      };
+
+      landuseLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'landuse-layer',
+        outFields: ['*'],
+        renderer: landuseRenderer,
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
+      });
+    }
+
+    view.map.add(landuseLayer);
+    console.log('土地利用类型专题图层已添加');
+  }
+
+  // ✅ 图例处理逻辑不变
+  if (!landuseLegendInstance) {
+    landuseLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: landuseLayer,
+        title: '土地利用类型'
+      }]
+    });
+    view.ui.add(landuseLegendInstance, 'bottom-left');
+    console.log('土地利用图例已创建');
+  }
+} else {
+  // ✅ 改为隐藏图层而不是移除
+  if (landuseLayerExists) {
+    landuseLayerExists.visible = false;
+    console.log('土地利用类型专题图层已隐藏');
+  }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
+  if (landuseLegendInstance) {
+    view.ui.remove(landuseLegendInstance);
+    landuseLegendInstance.destroy();
+    landuseLegendInstance = null;
+    console.log('土地利用图例已移除');
+  }
+}
+
+
+// --- 处理城中村图层和图例 ---
+const czcLayerExists = view.map.findLayerById('czc-layer');
+
+if (checkedKeysValue.includes('czc-layer')) {
+  // ✅ 图层已存在，直接设置为可见
+  if (czcLayerExists) {
+    czcLayerExists.visible = true;
+    console.log('城中村专题图层已显示');
+  } else {
+    // ✅ 图层不存在，首次创建并添加
+    if (!czcLayer) {
+      const czcRenderer = {
+        type: 'unique-value',
+        field: 'UrbanDat_6',
+        uniqueValueInfos: [
+          {
+            value: 1,
+            label: '城中村',
+            symbol: {
+              type: 'simple-fill',
+              color: '#e31a1c',
+              outline: { width: 0.5, color: '#333' }
+            }
+          },
+          {
+            value: 0,
+            label: '非城中村',
+            symbol: {
+              type: 'simple-fill',
+              color: '#f0f0f0',
+              outline: { width: 0.5, color: '#999' }
+            }
+          }
+        ]
+      };
+
+      czcLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'czc-layer',
+        outFields: ['*'],
+        renderer: czcRenderer,
+        opacity: 0.75,
+        visible: true // ✅ 初始可见
+      });
+    }
+
+    view.map.add(czcLayer);
+    console.log('城中村专题图层已添加');
+  }
+
+  // ✅ 图例处理逻辑不变
+  if (!czcLegendInstance) {
+    czcLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: czcLayer,
+        title: '城中村分布'
+      }]
+    });
+    view.ui.add(czcLegendInstance, 'bottom-left');
+    console.log('城中村图例已创建');
+  }
+} else {
+  // ✅ 改为隐藏图层而不是移除
+  if (czcLayerExists) {
+    czcLayerExists.visible = false;
+    console.log('城中村专题图层已隐藏');
+  }
+
+  // ✅ 图例仍然移除（也可改为保留但置灰）
+  if (czcLegendInstance) {
+    view.ui.remove(czcLegendInstance);
+    czcLegendInstance.destroy();
+    czcLegendInstance = null;
+    console.log('城中村图例已移除');
+  }
+}
+
 
 }
 </script>
