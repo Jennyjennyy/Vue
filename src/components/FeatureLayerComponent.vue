@@ -335,6 +335,7 @@ if (checkedKeysValue.includes('ndvi-layer')) {
         id: 'ndvi-layer',
         outFields: ['*'],
         renderer: ndviRenderer,
+        opacity: 0.75,
         visible: true // ✅ 初始可见
       });
 
@@ -446,6 +447,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
         id: 'pm25-layer',
         outFields: ['*'],
         renderer: pm25Renderer,
+        opacity: 0.75,
         visible: true // ✅ 初始可见
       });
     }
@@ -1196,6 +1198,7 @@ if (checkedKeysValue.includes('youth-layer')) {
         id: 'youth-layer',
         outFields: ['*'],
         renderer: youthRenderer,
+        opacity: 0.75,
         visible: true
       });
     }
@@ -1418,6 +1421,7 @@ if (checkedKeysValue.includes('senior-layer')) {
         id: 'senior-layer',
         outFields: ['*'],
         renderer: seniorRenderer,
+        opacity: 0.75,
         visible: true
       });
     }
