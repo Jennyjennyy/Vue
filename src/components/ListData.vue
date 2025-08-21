@@ -90,7 +90,7 @@ const fieldList = [
   '新建文e10', '新建文e11', '新建文e12', '新建文e13',
   '_博士_su', '_研究生', '_本科_su', '_大专_su', '_中专_su', '_高中_su', '_初中_su', '_初中以', '_义务教', '_学龄前',
   '_工业_su', '_农业_su', '_服务业', '_交通运', '_农业养', '_建筑业', '_其他_su', '_无业_su', '_非劳动',
-  'UrbanData_', 'UrbanDat_1', 'UrbanDat_2', 'UrbanDat_3', 'UrbanDat_4', 'UrbanDat_5', 'UrbanDat_6', 'UrbanDat_7', 'UrbanDat_8'
+  'UrbanData_', 'UrbanDat_1', 'UrbanDat_2', 'UrbanDat_3', 'UrbanDat_4', 'UrbanDat_5', 'UrbanDat_6', 'UrbanDat_7', 'UrbanDat_8','Age_Youth','Age_Middle','Age_Senior'
 ];
 
 const fieldAliasMap = {
@@ -136,7 +136,10 @@ const fieldAliasMap = {
   'UrbanDat_5': '土地利用类型名称',
   'UrbanDat_6': '是否为城中村（1=是）',
   'UrbanDat_7': '绿视率（NDVI）',
-  'UrbanDat_8': '空气质量（PM2.5）'
+  'UrbanDat_8': '空气质量（PM2.5）',
+  'Age_Youth':'青少年人口',
+  'Age_Middle':'中年人口',
+  'Age_Senior':'老年人口'
 }
 
 const dataSource = computed(() => {

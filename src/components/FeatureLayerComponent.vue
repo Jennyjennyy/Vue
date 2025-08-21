@@ -98,8 +98,19 @@ const treeData = [
           {
       title: '人口密度专题图',
       key: 'pop-layer'
-        }
-          // 其他人口相关图层可以后续添加 
+        },
+        {
+      title: '少年与青年层专题图',
+      key: 'youth-layer'
+    },
+    {
+      title: '中年层专题图',
+      key: 'middle-layer'
+    },
+    {
+      title: '老年层专题图',
+      key: 'senior-layer'
+    }
         ]
       }
     ]
@@ -127,6 +138,15 @@ let czcLayer = null
 let czcLegendInstance = null
 let popLayer = null;
 let popLegendInstance = null;
+let youthLayer = null;
+let youthLegendInstance = null;
+let middleLayer = null;
+let middleLegendInstance = null;
+let seniorLayer = null;
+let seniorLegendInstance = null;
+
+
+
 
 
 // 在 onMounted 中设置一次性的事件监听
@@ -1099,6 +1119,335 @@ if (checkedKeysValue.includes('pop-layer')) {
     popLegendInstance.destroy();
     popLegendInstance = null;
     console.log('人口密度图例已移除');
+  }
+}
+
+
+const youthLayerExists = view.map.findLayerById('youth-layer');
+
+if (checkedKeysValue.includes('youth-layer')) {
+  if (youthLayerExists) {
+    youthLayerExists.visible = true;
+    console.log('少年与青年层专题图层已显示');
+  } else {
+    if (!youthLayer) {
+      const youthRenderer = {
+        type: 'class-breaks',
+        field: 'Age_Youth',
+        legendOptions: {
+          title: '少年与青年人口（0–30岁）'
+        },
+        classBreakInfos: [
+          {
+            minValue: 0,
+            maxValue: 0,
+            label: '0',
+            symbol: {
+              type: 'simple-fill',
+              color: '#f7fbff',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 1,
+            maxValue: 500,
+            label: '1–500',
+            symbol: {
+              type: 'simple-fill',
+              color: '#deebf7',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 500,
+            maxValue: 1000,
+            label: '500–1,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#9ecae1',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 1000,
+            maxValue: 2000,
+            label: '1,000–2,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#6baed6',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 2000,
+            maxValue: 5000,
+            label: '2,000以上',
+            symbol: {
+              type: 'simple-fill',
+              color: '#2171b5',
+              outline: { width: 0.5, color: '#666' }
+            }
+          }
+        ]
+      };
+
+      youthLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'youth-layer',
+        outFields: ['*'],
+        renderer: youthRenderer,
+        visible: true
+      });
+    }
+
+    view.map.add(youthLayer);
+    console.log('少年与青年层专题图层已添加');
+  }
+
+  if (!youthLegendInstance) {
+    youthLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: youthLayer,
+        title: '少年与青年层分布'
+      }]
+    });
+    view.ui.add(youthLegendInstance, 'bottom-left');
+    console.log('少年与青年层图例已创建');
+  }
+} else {
+  if (youthLayerExists) {
+    youthLayerExists.visible = false;
+    console.log('少年与青年层专题图层已隐藏');
+  }
+
+  if (youthLegendInstance) {
+    view.ui.remove(youthLegendInstance);
+    youthLegendInstance.destroy();
+    youthLegendInstance = null;
+    console.log('少年与青年层图例已移除');
+  }
+}
+
+const middleLayerExists = view.map.findLayerById('middle-layer');
+
+if (checkedKeysValue.includes('middle-layer')) {
+  if (middleLayerExists) {
+    middleLayerExists.visible = true;
+    console.log('中年层专题图层已显示');
+  } else {
+    if (!middleLayer) {
+      const middleRenderer = {
+        type: 'class-breaks',
+        field: 'Age_Middle',
+        legendOptions: {
+          title: '中年人口分布（30–60岁）'
+        },
+        classBreakInfos: [
+    {
+      minValue: 0,
+      maxValue: 100,
+      label: '0–100',
+      symbol: {
+        type: 'simple-fill',
+        color: '#fff5eb',
+        outline: { width: 0.5, color: '#999' }
+      }
+    },
+    {
+      minValue: 100,
+      maxValue: 250,
+      label: '100–250',
+      symbol: {
+        type: 'simple-fill',
+        color: '#fee6ce',
+        outline: { width: 0.5, color: '#999' }
+      }
+    },
+    {
+      minValue: 250,
+      maxValue: 400,
+      label: '250–400',
+      symbol: {
+        type: 'simple-fill',
+        color: '#fdd0a2',
+        outline: { width: 0.5, color: '#999' }
+      }
+    },
+    {
+      minValue: 400,
+      maxValue: 500,
+      label: '400–500',
+      symbol: {
+        type: 'simple-fill',
+        color: '#fdae6b',
+        outline: { width: 0.5, color: '#999' }
+      }
+    },
+    {
+      minValue: 500,
+      maxValue: 2000,
+      label: '500–2,000',
+      symbol: {
+        type: 'simple-fill',
+        color: '#e6550d',
+        outline: { width: 0.5, color: '#666' }
+      }
+    }
+  ]
+};
+
+      middleLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'middle-layer',
+        outFields: ['*'],
+        renderer: middleRenderer,
+        opacity: 0.75,
+        visible: true
+      });
+    }
+
+    view.map.add(middleLayer);
+    console.log('中年层专题图层已添加');
+  }
+
+  if (!middleLegendInstance) {
+    middleLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: middleLayer,
+        title: '中年层分布'
+      }]
+    });
+    view.ui.add(middleLegendInstance, 'bottom-left');
+    console.log('中年层图例已创建');
+  }
+} else {
+  if (middleLayerExists) {
+    middleLayerExists.visible = false;
+    console.log('中年层专题图层已隐藏');
+  }
+
+  if (middleLegendInstance) {
+    view.ui.remove(middleLegendInstance);
+    middleLegendInstance.destroy();
+    middleLegendInstance = null;
+    console.log('中年层图例已移除');
+  }
+}
+const seniorLayerExists = view.map.findLayerById('senior-layer');
+
+if (checkedKeysValue.includes('senior-layer')) {
+  if (seniorLayerExists) {
+    seniorLayerExists.visible = true;
+    console.log('老年层专题图层已显示');
+  } else {
+    if (!seniorLayer) {
+      const seniorRenderer = {
+        type: 'class-breaks',
+        field: 'Age_Senior',
+        legendOptions: {
+          title: '老年人口分布（60岁以上）'
+        },
+        classBreakInfos: [
+          {
+            minValue: 0,
+            maxValue: 25,
+            label: '0–25',
+            symbol: {
+              type: 'simple-fill',
+              color: '#fef0d9',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 25,
+            maxValue: 50,
+            label: '25–50',
+            symbol: {
+              type: 'simple-fill',
+              color: '#fdcc8a',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 50,
+            maxValue: 100,
+            label: '50–100',
+            symbol: {
+              type: 'simple-fill',
+              color: '#fc8d59',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 100,
+            maxValue: 125,
+            label: '100–125',
+            symbol: {
+              type: 'simple-fill',
+              color: '#e34a33',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 125,
+            maxValue: 150,
+            label: '125–150',
+            symbol: {
+              type: 'simple-fill',
+              color: '#b30000',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 150,
+            maxValue: 1000,
+            label: '150以上',
+            symbol: {
+              type: 'simple-fill',
+              color: '#7f0000',
+              outline: { width: 0.5, color: '#666' }
+            }
+          }
+        ]
+      };
+
+      seniorLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'senior-layer',
+        outFields: ['*'],
+        renderer: seniorRenderer,
+        visible: true
+      });
+    }
+
+    view.map.add(seniorLayer);
+    console.log('老年层专题图层已添加');
+  }
+
+  if (!seniorLegendInstance) {
+    seniorLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: seniorLayer,
+        title: '老年层分布'
+      }]
+    });
+    view.ui.add(seniorLegendInstance, 'bottom-left');
+    console.log('老年层图例已创建');
+  }
+} else {
+  if (seniorLayerExists) {
+    seniorLayerExists.visible = false;
+    console.log('老年层专题图层已隐藏');
+  }
+
+  if (seniorLegendInstance) {
+    view.ui.remove(seniorLegendInstance);
+    seniorLegendInstance.destroy();
+    seniorLegendInstance = null;
+    console.log('老年层图例已移除');
   }
 }
 
