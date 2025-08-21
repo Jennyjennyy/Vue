@@ -832,7 +832,7 @@ if (checkedKeysValue.includes('power-layer')) {
     console.log('用电量专题图层已添加');
   }
 
-  // ✅ 图例处理逻辑不变
+  // 图例处理逻辑不变
   if (!powerLegendInstance) {
     powerLegendInstance = new Legend({
       view: view,
@@ -845,13 +845,13 @@ if (checkedKeysValue.includes('power-layer')) {
     console.log('用电量图例已创建');
   }
 } else {
-  // ✅ 改为隐藏图层而不是移除
+  // 改为隐藏图层而不是移除
   if (powerLayerExists) {
     powerLayerExists.visible = false;
     console.log('用电量专题图层已隐藏');
   }
 
-  // ✅ 图例仍然移除（也可改为保留但置灰）
+  // 图例仍然移除（也可改为保留但置灰）
   if (powerLegendInstance) {
     view.ui.remove(powerLegendInstance);
     powerLegendInstance.destroy();
@@ -865,12 +865,12 @@ if (checkedKeysValue.includes('power-layer')) {
 const landuseLayerExists = view.map.findLayerById('landuse-layer');
 
 if (checkedKeysValue.includes('landuse-layer')) {
-  // ✅ 图层已存在，直接设置为可见
+  // 图层已存在，直接设置为可见
   if (landuseLayerExists) {
     landuseLayerExists.visible = true;
     console.log('土地利用类型专题图层已显示');
   } else {
-    // ✅ 图层不存在，首次创建并添加
+    // 图层不存在，首次创建并添加
     if (!landuseLayer) {
       const landuseRenderer = {
         type: 'unique-value',
@@ -896,7 +896,7 @@ if (checkedKeysValue.includes('landuse-layer')) {
         outFields: ['*'],
         renderer: landuseRenderer,
         opacity: 0.75,
-        visible: true // ✅ 初始可见
+        visible: true 
       });
     }
 
@@ -904,7 +904,7 @@ if (checkedKeysValue.includes('landuse-layer')) {
     console.log('土地利用类型专题图层已添加');
   }
 
-  // ✅ 图例处理逻辑不变
+  // 图例处理逻辑不变
   if (!landuseLegendInstance) {
     landuseLegendInstance = new Legend({
       view: view,
@@ -917,7 +917,7 @@ if (checkedKeysValue.includes('landuse-layer')) {
     console.log('土地利用图例已创建');
   }
 } else {
-  // ✅ 改为隐藏图层而不是移除
+  // 改为隐藏图层而不是移除
   if (landuseLayerExists) {
     landuseLayerExists.visible = false;
     console.log('土地利用类型专题图层已隐藏');
@@ -937,12 +937,12 @@ if (checkedKeysValue.includes('landuse-layer')) {
 const czcLayerExists = view.map.findLayerById('czc-layer');
 
 if (checkedKeysValue.includes('czc-layer')) {
-  // ✅ 图层已存在，直接设置为可见
+  // 图层已存在，直接设置为可见
   if (czcLayerExists) {
     czcLayerExists.visible = true;
     console.log('城中村专题图层已显示');
   } else {
-    // ✅ 图层不存在，首次创建并添加
+    // 图层不存在，首次创建并添加
     if (!czcLayer) {
       const czcRenderer = {
         type: 'unique-value',
