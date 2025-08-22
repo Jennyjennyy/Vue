@@ -20,7 +20,7 @@ const emit = defineEmits(['grid-clicked'])
 
 const treeData = [
   {
-    title: '图层控制',
+    title: '空间画像',
     key: 'layer',
     children: [
       {
@@ -32,15 +32,15 @@ const treeData = [
         key: 'land',
         children: [
           {
-            title: '土地利用类型专题图',
+            title: '土地覆被',
             key: 'landuse-layer'
           },
           {
-            title: '建筑体积专题图',
+            title: '建筑开发强度',
             key: 'volume-layer'
           },
           {
-            title: '城中村专题图',
+            title: '城中村范围',
             key: 'czc-layer'
           }
         ]
@@ -50,11 +50,11 @@ const treeData = [
         key: 'ecology',
         children: [
           {
-            title: 'NDVI专题图',
+            title: '绿视率',
             key: 'ndvi-layer'
           },
           {
-            title: 'PM2.5专题图',
+            title: '空气污染',
             key: 'pm25-layer'
           }
         ]
@@ -64,7 +64,7 @@ const treeData = [
         key: 'transport',
         children: [
           {
-      title: '公共交通流量专题图',
+      title: '公共交通流量',
       key: 'transit-layer'
     }
         ]
@@ -74,11 +74,11 @@ const treeData = [
         key: 'energy',
         children: [
           {
-            title: '用电量专题图',
+            title: '电力消耗',
             key: 'power-layer'
           },
           {
-      title: '屋顶光伏潜力专题图',
+      title: '光伏潜力',
       key: 'solar-layer'
     }
         ]
@@ -88,11 +88,11 @@ const treeData = [
         key: 'economy',
         children: [
           {
-            title: '房价专题图',
+            title: '房价',
             key: 'fangjia-layer'
           },
           {
-            title: '2020 GDP 专题图',
+            title: 'GDP',
             key: 'gdp-layer'
           }
         ]
@@ -102,19 +102,19 @@ const treeData = [
         key: 'population',
         children: [
           {
-      title: '人口密度专题图',
+      title: '人口密度',
       key: 'pop-layer'
         },
         {
-      title: '少年与青年层专题图',
+      title: '少年与青年层',
       key: 'youth-layer'
     },
     {
-      title: '中年层专题图',
+      title: '中年层',
       key: 'middle-layer'
     },
     {
-      title: '老年层专题图',
+      title: '老年层',
       key: 'senior-layer'
     }
         ]
