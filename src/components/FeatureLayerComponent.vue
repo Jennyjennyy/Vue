@@ -63,7 +63,10 @@ const treeData = [
         title: '交通',
         key: 'transport',
         children: [
-          // 如果你之后有“公共交通流量”或“可达性”图层，可以加在这里
+          {
+      title: '公共交通流量专题图',
+      key: 'transit-layer'
+    }
         ]
       },
       {
@@ -73,8 +76,11 @@ const treeData = [
           {
             title: '用电量专题图',
             key: 'power-layer'
-          }
-          // 光伏潜力图层可以后续添加
+          },
+          {
+      title: '屋顶光伏潜力专题图',
+      key: 'solar-layer'
+    }
         ]
       },
       {
@@ -144,6 +150,10 @@ let middleLayer = null;
 let middleLegendInstance = null;
 let seniorLayer = null;
 let seniorLegendInstance = null;
+let solarLayer = null;
+let solarLegendInstance = null;
+let transitLayer = null;
+let transitLegendInstance = null;
 
 
 
@@ -263,12 +273,12 @@ const onCheck = async (checkedKeysValue) => {
   const ndviLayerExists = view.map.findLayerById('ndvi-layer');
 
 if (checkedKeysValue.includes('ndvi-layer')) {
-  // ✅ 图层已存在，直接设置为可见
+  // 图层已存在，直接设置为可见
   if (ndviLayerExists) {
     ndviLayerExists.visible = true;
     console.log('NDVI专题图层已显示');
   } else {
-    // ✅ 图层不存在，首次创建并添加
+    // 图层不存在，首次创建并添加
     if (!ndviLayer) {
       const ndviRenderer = {
         type: 'class-breaks',
@@ -375,12 +385,12 @@ if (checkedKeysValue.includes('ndvi-layer')) {
 const pm25LayerExists = view.map.findLayerById('pm25-layer');
 
 if (checkedKeysValue.includes('pm25-layer')) {
-  // ✅ 图层已存在，直接设置为可见
+  // 图层已存在，直接设置为可见
   if (pm25LayerExists) {
     pm25LayerExists.visible = true;
     console.log('PM2.5专题图层已显示');
   } else {
-    // ✅ 图层不存在，首次创建并添加
+    // 图层不存在，首次创建并添加
     if (!pm25Layer) {
       const pm25Renderer = {
         type: 'class-breaks',
@@ -448,7 +458,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
         outFields: ['*'],
         renderer: pm25Renderer,
         opacity: 0.75,
-        visible: true // ✅ 初始可见
+        visible: true // 初始可见
       });
     }
 
@@ -456,7 +466,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
     console.log('PM2.5专题图层已添加');
   }
 
-  // ✅ 图例处理逻辑不变
+  // 图例处理逻辑不变
   if (!pm25LegendInstance) {
     pm25LegendInstance = new Legend({
       view: view,
@@ -469,7 +479,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
     console.log('PM2.5图例已创建');
   }
 } else {
-  // ✅ 改为隐藏图层而不是移除
+  // 改为隐藏图层而不是移除
   if (pm25LayerExists) {
     pm25LayerExists.visible = false;
     console.log('PM2.5专题图层已隐藏');
@@ -482,16 +492,18 @@ if (checkedKeysValue.includes('pm25-layer')) {
   }
 }
 
+
+
 // --- 4. 处理房价图层和图例 ---
 const fangjiaLayerExists = view.map.findLayerById('fangjia-layer');
 
 if (checkedKeysValue.includes('fangjia-layer')) {
-  // ✅ 图层已存在，直接设置为可见
+  // 图层已存在，直接设置为可见
   if (fangjiaLayerExists) {
     fangjiaLayerExists.visible = true;
     console.log('房价专题图层已显示');
   } else {
-    // ✅ 图层不存在，首次创建并添加
+    // 图层不存在，首次创建并添加
     if (!fangjiaLayer) {
       const fangjiaRenderer = {
         type: 'class-breaks',
@@ -559,7 +571,7 @@ if (checkedKeysValue.includes('fangjia-layer')) {
         outFields: ['*'],
         renderer: fangjiaRenderer,
         opacity: 0.75,
-        visible: true // ✅ 初始可见
+        visible: true 
       });
     }
 
@@ -1452,6 +1464,218 @@ if (checkedKeysValue.includes('senior-layer')) {
     seniorLegendInstance.destroy();
     seniorLegendInstance = null;
     console.log('老年层图例已移除');
+  }
+}
+const solarLayerExists = view.map.findLayerById('solar-layer');
+
+if (checkedKeysValue.includes('solar-layer')) {
+  if (solarLayerExists) {
+    solarLayerExists.visible = true;
+    console.log('屋顶光伏潜力专题图层已显示');
+  } else {
+    if (!solarLayer) {
+      const solarRenderer = {
+        type: 'class-breaks',
+        field: 'solar_kwh_',
+        legendOptions: {
+          title: '屋顶光伏潜力（kWh）'
+        },
+        classBreakInfos: [
+          {
+            minValue: 0,
+            maxValue: 50000,
+            label: '0–50,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#ffffcc',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 50000,
+            maxValue: 200000,
+            label: '50,000–200,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#a1dab4',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 200000,
+            maxValue: 800000,
+            label: '200,000–800,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#41b6c4',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 800000,
+            maxValue: 3000000,
+            label: '800,000–3,000,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#2c7fb8',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 3000000,
+            maxValue: 13000000,
+            label: '3,000,000–13,000,000',
+            symbol: {
+              type: 'simple-fill',
+              color: '#253494',
+              outline: { width: 0.5, color: '#999' }
+            }
+          }
+        ]
+      };
+
+      solarLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'solar_kwh_',
+        outFields: ['*'],
+        renderer: solarRenderer,
+        opacity: 0.75,
+        visible: true
+      });
+    }
+
+    view.map.add(solarLayer);
+    console.log('屋顶光伏潜力专题图层已添加');
+  }
+
+  if (!solarLegendInstance) {
+    solarLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: solarLayer,
+        title: '屋顶光伏潜力分布'
+      }]
+    });
+    view.ui.add(solarLegendInstance, 'bottom-left');
+    console.log('屋顶光伏潜力图例已创建');
+  }
+} else {
+  if (solarLayerExists) {
+    solarLayerExists.visible = false;
+    console.log('屋顶光伏潜力专题图层已隐藏');
+  }
+
+  if (solarLegendInstance) {
+    view.ui.remove(solarLegendInstance);
+    solarLegendInstance.destroy();
+    solarLegendInstance = null;
+    console.log('屋顶光伏潜力图例已移除');
+  }
+}
+const transitLayerExists = view.map.findLayerById('transit-layer');
+
+if (checkedKeysValue.includes('transit-layer')) {
+  if (transitLayerExists) {
+    transitLayerExists.visible = true;
+    console.log('公共交通流量专题图层已显示');
+  } else {
+    if (!transitLayer) {
+      const transitRenderer = {
+        type: 'class-breaks',
+        field: 'avg_daily_',
+        legendOptions: {
+          title: '平均日公共交通流量'
+        },
+        classBreakInfos: [
+          {
+            minValue: 0,
+            maxValue: 100,
+            label: '0–100',
+            symbol: {
+              type: 'simple-fill',
+              color: '#ffffcc',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 100,
+            maxValue: 300,
+            label: '100–300',
+            symbol: {
+              type: 'simple-fill',
+              color: '#a1dab4',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 300,
+            maxValue: 500,
+            label: '300–500',
+            symbol: {
+              type: 'simple-fill',
+              color: '#41b6c4',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 500,
+            maxValue: 700,
+            label: '500–700',
+            symbol: {
+              type: 'simple-fill',
+              color: '#2c7fb8',
+              outline: { width: 0.5, color: '#999' }
+            }
+          },
+          {
+            minValue: 700,
+            maxValue: 12430,
+            label: '700以上',
+            symbol: {
+              type: 'simple-fill',
+              color: '#253494',
+              outline: { width: 0.5, color: '#999' }
+            }
+          }
+        ]
+      };
+
+      transitLayer = new FeatureLayer({
+        url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
+        id: 'transit-layer',
+        outFields: ['*'],
+        renderer: transitRenderer,
+        opacity: 0.75,
+        visible: true
+      });
+    }
+
+    view.map.add(transitLayer);
+    console.log('公共交通流量专题图层已添加');
+  }
+
+  if (!transitLegendInstance) {
+    transitLegendInstance = new Legend({
+      view: view,
+      layerInfos: [{
+        layer: transitLayer,
+        title: '公共交通流量分布'
+      }]
+    });
+    view.ui.add(transitLegendInstance, 'bottom-left');
+    console.log('公共交通流量图例已创建');
+  }
+} else {
+  if (transitLayerExists) {
+    transitLayerExists.visible = false;
+    console.log('公共交通流量专题图层已隐藏');
+  }
+
+  if (transitLegendInstance) {
+    view.ui.remove(transitLegendInstance);
+    transitLegendInstance.destroy();
+    transitLegendInstance = null;
+    console.log('公共交通流量图例已移除');
   }
 }
 
