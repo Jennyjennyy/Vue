@@ -272,7 +272,7 @@ if (checkedKeysValue.includes('ndvi-layer')) {
     if (!ndviLayer) {
       const ndviRenderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_7',
+        field: 'NDVI',
         legendOptions: {
           title: '绿化率（NDVI）'
         },
@@ -384,7 +384,7 @@ if (checkedKeysValue.includes('pm25-layer')) {
     if (!pm25Layer) {
       const pm25Renderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_8',
+        field: 'PM25',
         legendOptions: {
           title: 'PM2.5 浓度分布'
         },
@@ -495,7 +495,7 @@ if (checkedKeysValue.includes('fangjia-layer')) {
     if (!fangjiaLayer) {
       const fangjiaRenderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_3',
+        field: 'fangjia',
         legendOptions: {
           title: '房价分布（元/平方米）'
         },
@@ -609,7 +609,7 @@ if (checkedKeysValue.includes('gdp-layer')) {
     if (!gdpLayer) {
       const gdpRenderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_2',
+        field: '2020gdp',
         legendOptions: {
           title: '2020年GDP（亿元）'
         },
@@ -733,7 +733,7 @@ if (checkedKeysValue.includes('volume-layer')) {
     if (!volumeLayer) {
       const volumeRenderer = {
         type: 'class-breaks',
-        field: 'UrbanDat_1',
+        field: 'bld_area',
         legendOptions: {
           title: '建筑体积分布（m³）'
         },
@@ -806,7 +806,7 @@ if (checkedKeysValue.includes('power-layer')) {
     if (!powerLayer) {
       const powerRenderer = {
         type: 'class-breaks',
-        field: 'UrbanData_',
+        field: 'EC2019',
         legendOptions: {
           title: '用电量（kWh）'
         },
@@ -876,7 +876,7 @@ if (checkedKeysValue.includes('landuse-layer')) {
     if (!landuseLayer) {
       const landuseRenderer = {
         type: 'unique-value',
-        field: 'UrbanDat_5',
+        field: 'Landuse',
         legendOptions: {
           title: '土地利用类型'
         },
@@ -948,7 +948,7 @@ if (checkedKeysValue.includes('czc-layer')) {
     if (!czcLayer) {
       const czcRenderer = {
         type: 'unique-value',
-        field: 'UrbanDat_6',
+        field: 'CinC',
         legendOptions: {
           title: '城中村分布'
         },
@@ -1027,7 +1027,7 @@ if (checkedKeysValue.includes('pop-layer')) {
     if (!popLayer) {
       const popRenderer = {
         type: 'class-breaks',
-        field: '新建文e',
+        field: 'PEOPLE',
         legendOptions: {
           title: '人口密度'
         },
