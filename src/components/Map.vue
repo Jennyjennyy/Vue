@@ -67,10 +67,15 @@ onMounted(async () => {
   layers.vector = [vecLayer, cvaLayer]
   layers.satellite = [imgLayer, ciaLayer]
 
-  // 创建地图对象，默认使用矢量底图
+  // 创建地图对象，添加所有图层但只显示矢量底图
   map = new Map({
-    layers: layers.vector,
+    layers: [...layers.vector, ...layers.satellite],
     logo: false
+  })
+
+  // 默认隐藏影像图层
+  layers.satellite.forEach(layer => {
+    layer.visible = false
   })
 
   // 创建视图
@@ -96,14 +101,22 @@ onMounted(async () => {
 const switchBasemap = () => {
   if (!map) return
   
-  // 清除当前图层
-  map.removeAll()
-  
-  // 添加选中的图层组合
   if (selectedBasemap.value === 'vector') {
-    layers.vector.forEach(layer => map.add(layer))
+    // 显示矢量图层，隐藏影像图层
+    layers.vector.forEach(layer => {
+      layer.visible = true
+    })
+    layers.satellite.forEach(layer => {
+      layer.visible = false
+    })
   } else if (selectedBasemap.value === 'satellite') {
-    layers.satellite.forEach(layer => map.add(layer))
+    // 显示影像图层，隐藏矢量图层
+    layers.vector.forEach(layer => {
+      layer.visible = false
+    })
+    layers.satellite.forEach(layer => {
+      layer.visible = true
+    })
   }
 }
 </script>
@@ -123,7 +136,7 @@ const switchBasemap = () => {
 .basemap-switcher {
   position: absolute;
   bottom: 15px;
-  left: 15px;
+  right: 370px;
   background: white;
   padding: 10px;
   border-radius: 6px;
