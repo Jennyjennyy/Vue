@@ -888,7 +888,7 @@ if (checkedKeysValue.includes('landuse-layer')) {
     if (!landuseLayer) {
       const landuseRenderer = {
         type: 'unique-value',
-        field: 'Landuse',
+        field: 'LU_text',
         legendOptions: {
           title: '土地利用类型'
         },
@@ -1536,7 +1536,7 @@ if (checkedKeysValue.includes('solar-layer')) {
 
       solarLayer = new FeatureLayer({
         url: 'https://2d-arcgis-dev.cloud.cityworks.cn/arcgis/rest/services/keti/Mapserver/0',
-        id: 'solar_kwh_',
+        id: 'solar-layer',
         outFields: ['*'],
         renderer: solarRenderer,
         opacity: 0.75,
@@ -1689,7 +1689,7 @@ if (checkedKeysValue.includes('transit-layer')) {
   top: 65px;
   left: 0;
   width: 240px;
-  height: calc(100vh - 380px);
+  height: calc(100vh - 480px);
   background-color: #fff;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
   z-index: 1001;
